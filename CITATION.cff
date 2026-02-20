@@ -1,0 +1,9 @@
+cff-version: 1.2.0
+message: "If you use this software or architecture, please cite it as below."
+authors:
+- family-names: "Mitra"
+  given-names: "Raj"
+title: "Honeycomb Cell System (HCS)"
+version: 1.0.0
+date-released: 2026-02-20
+url: "https://github.com/rajmitra/hcs-hacs"
