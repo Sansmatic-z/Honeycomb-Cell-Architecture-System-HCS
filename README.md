@@ -6,6 +6,19 @@ The Honeycomb Cell System (HCS) is a distributed computational architecture base
 
 Designed by **Raj Mitra**.
 
+```mermaid
+graph TD
+    A[HDA Container .hda] --> B[Spine Parser]
+    B --> C[Topology Manifest]
+    C --> D[Streaming Cell Processor]
+    D --> E[Cell 1: Visual]
+    D --> F[Cell 2: Worker]
+    D --> G[Cell 3: Hive Recursive]
+    E --> H[Sandboxed Output]
+    F --> I[Background Compute]
+    G --> J[Sub-Hive Graph]
+```
+
 ## 🧬 Core Vision
 
 HCS represents a shift from centralized control to emergent computation. By arranging autonomous cells in a hexagonal grid, computational power scales through spatial expansion rather than architectural redesign.
@@ -17,7 +30,7 @@ The system is defined by several key layers:
 - **Layer 2: Structural Graph** – The mapping of neighbor relationships.
 - **Layer 11: Runtime Architecture** – The engine capable of parsing and executing HCS graphs.
 
-For a deep dive into the theoretical framework, mathematical model, and execution cycle, see [ARCHITECTURE.md](./ARCHITECTURE.md).
+For a deep dive into the theoretical framework, mathematical model, and execution cycle, see [ARCHITECTURE.md](./ARCHITECTURE.md) and the [VISION.md](./VISION.md).
 
 ## 🚀 Live Demo
 

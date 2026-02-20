@@ -1,0 +1,18 @@
+# Secrets and Credentials
+pat.txt
+.env
+*.key
+*.pem
+secrets/
+keep secret/
+
+# OS/System files
+.DS_Store
+Thumbs.db
+.directory
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+/data/data/com.termux/files/home/.gemini/tmp/
