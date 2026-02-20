@@ -23,6 +23,12 @@ graph TD
 
 HCS represents a shift from centralized control to emergent computation. By arranging autonomous cells in a hexagonal grid, computational power scales through spatial expansion rather than architectural redesign.
 
+## 📚 Research & Specifications
+
+For those interested in the scientific and engineering foundations of HCS, we have published detailed formalisms:
+- [**Formal Computational Theory**](./docs/THEORY.md) – Mathematical models, neighborhood functions, and stability conditions.
+- [**Implementation Specification**](./docs/SPECIFICATION.md) – Runtime engine architecture, memory tiers, and communication protocols.
+
 ## 🏗️ Architecture
 
 The system is defined by several key layers:
