@@ -116,15 +116,13 @@ This is stated honestly so researchers can evaluate the work accurately.
 
 ---
 
-## Live Demos
+## Live Demo
 
-### 1. HDA Container Protocol
 A reference implementation of the **HDA (Honeycomb Data Architecture)** container protocol:
-→ [demo/demo.hda.html](demo/demo.hda.html) — Demonstrates parallel scaling, encryption, and deflate compression.
 
-### 2. Distributed Computation (Truthful Architecture Proof)
-A truthful demonstration of **HCS Emergence** in action:
-→ [demo/hcs_distributed_demo.html](demo/hcs_distributed_demo.html) — Watch global computation (distance fields and waves) emerge from pure neighbor-to-neighbor communication with zero central control.
+→ [demo/demo.hda.html](demo/demo.hda.html) — Open in any modern browser. No install required.
+
+Demonstrates parallel scaling, AES-256-GCM encryption, and deflate compression operating within the HCS topology.
 
 ---
 
