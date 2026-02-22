@@ -1,62 +1,56 @@
-# Honeycomb Cell System (HCS)
+# Honeycomb Cell Architecture System (HCS)
 
-> **Structure = Computation = Communication**
+> **"Structure = Computation = Communication"**
 
-The Honeycomb Cell System (HCS) is a distributed computational architecture based on a hexagonal lattice topology. It unifies data representation, execution environments, and communication pathways into a single, scalable, fractal structure.
+**Conceived by Raj Mitra** · Independent Researcher · 2025-2026
 
-Designed by **Raj Mitra**.
+---
 
-```mermaid
-graph TD
-    A[HDA Container .hda] --> B[Spine Parser]
-    B --> C[Topology Manifest]
-    C --> D[Streaming Cell Processor]
-    D --> E[Cell 1: Visual]
-    D --> F[Cell 2: Worker]
-    D --> G[Cell 3: Hive Recursive]
-    E --> H[Sandboxed Output]
-    F --> I[Background Compute]
-    G --> J[Sub-Hive Graph]
-```
+## 1. Overview
 
-## 🧬 Core Vision
+HCS is a topology-driven distributed computation paradigm. It is based on the principle that the physical and logical structure of a system should directly determine its computational behavior and communication pathways.
 
-HCS represents a shift from centralized control to emergent computation. By arranging autonomous cells in a hexagonal grid, computational power scales through spatial expansion rather than architectural redesign.
+By utilizing a **Hexagonal Lattice Topology**, HCS achieves:
+- **Maximum Spatial Efficiency:** Every cell has exactly 6 neighbors at equal distance.
+- **Decentralized Emergence:** Global logic emerges from local cell-to-cell interactions.
+- **Unified Protocol:** Data representation, execution environment, and network routing are collapsed into a single structural layer.
 
-## 📚 Research & Specifications
+---
 
-For those interested in the scientific and engineering foundations of HCS, we have published detailed formalisms:
-- [**Formal Computational Theory**](./docs/THEORY.md) – Mathematical models, neighborhood functions, and stability conditions.
-- [**Implementation Specification**](./docs/SPECIFICATION.md) – Runtime engine architecture, memory tiers, and communication protocols.
+## 2. The Modular Kingdom
 
-## 🏗️ Architecture
+HCS serves as the foundational architecture for a larger ecosystem of research projects:
 
-The system is defined by several key layers:
-- **Layer 1: HDA Encoding** – Serialized representation of cell structure and connectivity.
-- **Layer 2: Structural Graph** – The mapping of neighbor relationships.
-- **Layer 11: Runtime Architecture** – The engine capable of parsing and executing HCS graphs.
+### 🌐 [PDPF (Programmable Dynamic Pattern Format)](https://github.com/Sansmatic-z/PDPF)
+A rule-based generative media format designed for AI training and temporal research. It implements the **Supernova Training Curriculum**.
 
-For a deep dive into the theoretical framework, mathematical model, and execution cycle, see [ARCHITECTURE.md](./ARCHITECTURE.md) and the [VISION.md](./VISION.md).
+### 🧠 [LIVINGPATTERN](https://github.com/Sansmatic-z/LIVINGPATTERN)
+A self-training neural system that learns from chaotic pattern dynamics without external supervision.
 
-## 🚀 Live Demo
+---
 
-A reference implementation of the **HDA (Honeycomb Data Architecture)** container protocol is available in the `demo/` folder.
+## 3. Core Principles
 
-- [View Demo Container](./demo/demo.hda.html) (Requires a modern browser)
+1.  **Locality:** Cells only interact with their immediate 6 neighbors. There is no central controller.
+2.  **Fractal Scaling:** The hexagonal pattern is recursive; a group of 7 cells can form a "Super-Cell" following the same rules.
+3.  **Surprise-Driven Learning:** The system evolves by minimizing the gap between predicted and actual structural states.
 
-This demo showcases a self-aware archive container that uses **Parallel Scaling**, **AES-256-GCM Encryption**, and **Deflate Compression** to forge payloads directly in the browser.
+---
 
-## 🛡️ Principles
+## 4. Documentation
 
-1. **Locality:** Cells operate using only local information.
-2. **Emergent Computation:** Global behavior arises from repeated local transformations.
-3. **Structural Execution:** Topology defines the execution pathways.
-4. **Distributed State:** No central control; the state is the system.
+For the full theoretical background, see the **[Research Concepts Paper](https://github.com/Sansmatic-z/PDPF/blob/main/research_concepts.docx)** located in the PDPF repository.
 
-## 📄 License
+---
 
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
+## Author
 
-## 🎓 Citation
+**Raj Mitra** — Independent researcher.
 
-If you use this architecture in your research or projects, please cite it using the information in [CITATION.cff](./CITATION.cff).
+GitHub: [github.com/Sansmatic-z](https://github.com/Sansmatic-z)
+
+---
+
+## License
+
+MIT
