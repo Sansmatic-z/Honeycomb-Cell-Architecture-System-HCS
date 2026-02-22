@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCS — Logic Substrate Proof</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@800&display=swap');
+
+:root {
+  --bg: #02040a;
+  --panel: #0d1117;
+  --border: #30363d;
+  --wire: #1f6feb;
+  --gate: #ab7df8;
+  --source: #3fb950;
+  --text: #c9d1d9;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+header {
+  padding: 20px 30px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+}
+
+h1 span { color: var(--wire); }
+
+.theory-badge {
+  background: rgba(31, 111, 235, 0.1);
+  border: 1px solid var(--wire);
+  color: var(--wire);
+  padding: 6px 12px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Main Layout */
+main {
+  display: flex;
+  flex: 1;
+}
+
+#canvas-container {
+  flex: 1;
+  position: relative;
+  cursor: crosshair;
+}
+
+canvas {
+  display: block;
+}
+
+/* Sidebar */
+#sidebar {
+  width: 320px;
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.tool-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+h3 {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #8b949e;
+  letter-spacing: 0.1em;
+}
+
+.tool-btn {
+  background: #161b22;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+
+.tool-btn:hover { background: #21262d; border-color: #8b949e; }
+.tool-btn.active { 
+  background: rgba(31, 111, 235, 0.1); 
+  border-color: var(--wire); 
+  color: #fff;
+}
+
+.icon { width: 12px; height: 12px; border-radius: 2px; }
+
+/* Stats & Info */
+.info-box {
+  background: #000;
+  border: 1px solid var(--border);
+  padding: 15px;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.info-box strong { color: var(--wire); }
+
+.proof-statement {
+  font-size: 12px;
+  color: #8b949e;
+  font-style: italic;
+  margin-top: auto;
+}
+
+button.action-btn {
+  background: var(--wire);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+button.action-btn:hover { filter: brightness(1.1); }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title">
+    <h1>HCS <span>Logic Substrate</span></h1>
+    <p style="font-size: 10px; color: #8b949e;">Theory 1 Proof: Topology as Computation</p>
+  </div>
+  <div class="theory-badge">Structure = Computation = Communication</div>
+</header>
+
+<main>
+  <div id="canvas-container">
+    <canvas id="stage"></canvas>
+  </div>
+
+  <div id="sidebar">
+    <div class="tool-group">
+      <h3>Select Component</h3>
+      <button class="tool-btn active" data-type="wire" onclick="setTool('wire')">
+        <div class="icon" style="background: var(--wire)"></div>
+        Wire (Conductive Path)
+      </button>
+      <button class="tool-btn" data-type="source" onclick="setTool('source')">
+        <div class="icon" style="background: var(--source)"></div>
+        Source (Clock/Input)
+      </button>
+      <button class="tool-btn" data-type="and" onclick="setTool('and')">
+        <div class="icon" style="background: var(--gate)"></div>
+        AND Junction (2+ Inputs)
+      </button>
+      <button class="tool-btn" data-type="not" onclick="setTool('not')">
+        <div class="icon" style="background: #f85149"></div>
+        NOT Inverter
+      </button>
+      <button class="tool-btn" data-type="empty" onclick="setTool('empty')">
+        <div class="icon" style="background: transparent; border: 1px dashed #30363d;"></div>
+        Eraser
+      </button>
+    </div>
+
+    <div class="tool-group">
+      <h3>Simulation Control</h3>
+      <button class="action-btn" onclick="resetCircuit()">Clear Substrate</button>
+      <div class="info-box">
+        <strong>How to Prove Theory 1:</strong><br>
+        1. Place <strong>Source</strong> cells.<br>
+        2. Draw paths using <strong>Wire</strong>.<br>
+        3. Create an <strong>AND</strong> junction.<br>
+        4. Observe the result emerges <em>without</em> a CPU.
+      </div>
+    </div>
+
+    <div class="proof-statement">
+      "In HCS, the wire is the communication, the junction is the logic, and the cell is the memory. The bus is dead."
+    </div>
+  </div>
+</main>
+
+<script>
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const container = document.getElementById('canvas-container');
+
+let W, H, HEX_SIZE = 22;
+let grid = {};
+let tool = 'wire';
+let tickCount = 0;
+
+function resize() {
+  W = canvas.width = container.clientWidth;
+  H = canvas.height = container.clientHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Axial coordinate helpers
+function getHexPos(q, r) {
+  const x = HEX_SIZE * 3/2 * q;
+  const y = HEX_SIZE * Math.sqrt(3) * (r + q/2);
+  return { x: x + W/2, y: y + H/2 };
+}
+
+function pixelToAxial(x, y) {
+  const q = (2/3 * (x - W/2)) / HEX_SIZE;
+  const r = (-1/3 * (x - W/2) + Math.sqrt(3)/3 * (y - H/2)) / HEX_SIZE;
+  return axialRound(q, r);
+}
+
+function axialRound(q, r) {
+  let x = q, z = r, y = -x-z;
+  let rx = Math.round(x), rz = Math.round(z), ry = Math.round(y);
+  let dx = Math.abs(rx - x), dz = Math.abs(rz - z), dy = Math.abs(ry - y);
+  if (dx > dy && dx > dz) rx = -ry-rz;
+  else if (dy > dz) ry = -rx-rz;
+  else rz = -rx-ry;
+  return { q: rx, r: rz };
+}
+
+const DIRS = [[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]];
+
+// --- PROOF CORE ---
+// The transition function F(cell, neighbors)
+function processCell(cell, neighbors) {
+  const activeNeighbors = neighbors.filter(n => n.state === 1).length;
+  
+  if (cell.type === 'source') {
+    // Clock pulse every 10 ticks
+    return (Math.floor(tickCount / 5) % 2 === 0) ? 1 : 0;
+  }
+  
+  if (cell.type === 'wire') {
+    // If any neighbor is active, I become active
+    return activeNeighbors > 0 ? 1 : 0;
+  }
+  
+  if (cell.type === 'and') {
+    // Fires only if 2 or more neighbors are active
+    return activeNeighbors >= 2 ? 1 : 0;
+  }
+  
+  if (cell.type === 'not') {
+    // Fires only if NO neighbors are active
+    return activeNeighbors === 0 ? 1 : 0;
+  }
+  
+  return 0;
+}
+
+function update() {
+  tickCount++;
+  const nextStates = {};
+  
+  // Each cell independently computes next state based on neighbors
+  for (const key in grid) {
+    const cell = grid[key];
+    const neighbors = [];
+    for (const d of DIRS) {
+      const nk = `${cell.q+d[0]},${cell.r+d[1]}`;
+      if (grid[nk]) neighbors.push(grid[nk]);
+    }
+    nextStates[key] = processCell(cell, neighbors);
+  }
+  
+  // Apply states
+  for (const key in grid) {
+    grid[key].state = nextStates[key];
+  }
+}
+
+function drawHex(q, r, color, active) {
+  const { x, y } = getHexPos(q, r);
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI/3 * i;
+    const hx = x + HEX_SIZE * 0.95 * Math.cos(angle);
+    const hy = y + HEX_SIZE * 0.95 * Math.sin(angle);
+    if (i === 0) ctx.moveTo(hx, hy);
+    else ctx.lineTo(hx, hy);
+  }
+  ctx.closePath();
+  
+  ctx.fillStyle = active ? color : '#0d1117';
+  ctx.fill();
+  ctx.strokeStyle = active ? '#fff' : '#30363d';
+  ctx.lineWidth = active ? 2 : 1;
+  ctx.stroke();
+  
+  // Type indicator
+  const cell = grid[`${q},${r}`];
+  if (cell && !active) {
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.3;
+    ctx.fill();
+    ctx.globalAlpha = 1.0;
+  }
+}
+
+function render() {
+  ctx.fillStyle = var(--bg);
+  ctx.fillRect(0, 0, W, H);
+  
+  // Draw base grid hint
+  const range = 15;
+  for (let q = -range; q <= range; q++) {
+    for (let r = -range; r <= range; r++) {
+      const key = `${q},${r}`;
+      let color = '#30363d';
+      let active = false;
+      
+      if (grid[key]) {
+        active = grid[key].state === 1;
+        if (grid[key].type === 'wire') color = '#1f6feb';
+        if (grid[key].type === 'source') color = '#3fb950';
+        if (grid[key].type === 'and') color = '#ab7df8';
+        if (grid[key].type === 'not') color = '#f85149';
+      }
+      
+      drawHex(q, r, color, active);
+    }
+  }
+  requestAnimationFrame(render);
+}
+
+// --- INTERACTION ---
+canvas.addEventListener('mousedown', handlePointer);
+canvas.addEventListener('mousemove', (e) => { if(e.buttons === 1) handlePointer(e); });
+
+function handlePointer(e) {
+  const rect = canvas.getBoundingClientRect();
+  const { q, r } = pixelToAxial(e.clientX - rect.left, e.clientY - rect.top);
+  const key = `${q},${r}`;
+  
+  if (tool === 'empty') {
+    delete grid[key];
+  } else {
+    grid[key] = { q, r, type: tool, state: 0 };
+  }
+}
+
+function setTool(t) {
+  tool = t;
+  document.querySelectorAll('.tool-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.type === t);
+  });
+}
+
+function resetCircuit() { grid = {}; }
+
+function autoProof() {
+  // Pre-build a simple AND gate logic
+  resetCircuit();
+  // Sources
+  grid['-5,0'] = { q:-5, r:0, type: 'source', state: 0 };
+  grid['-5,4'] = { q:-5, r:4, type: 'source', state: 0 };
+  // Wires
+  grid['-4,0'] = { q:-4, r:0, type: 'wire', state: 0 };
+  grid['-3,0'] = { q:-3, r:0, type: 'wire', state: 0 };
+  grid['-2,1'] = { q:-2, r:1, type: 'wire', state: 0 };
+  
+  grid['-4,3'] = { q:-4, r:3, type: 'wire', state: 0 };
+  grid['-3,2'] = { q:-3, r:2, type: 'wire', state: 0 };
+  grid['-2,2'] = { q:-2, r:2, type: 'wire', state: 0 };
+  
+  // AND Junction
+  grid['-1,2'] = { q:-1, r:2, type: 'and', state: 0 };
+  
+  // Output wire
+  grid['0,2'] = { q:0, r:2, type: 'wire', state: 0 };
+  grid['1,2'] = { q:1, r:2, type: 'wire', state: 0 };
+}
+
+// Tick the logic at 10Hz
+setInterval(update, 100);
+render();
+autoProof(); // Start with a pre-built logic gate to prove the point
+
+</script>
+</body>
+</html>
