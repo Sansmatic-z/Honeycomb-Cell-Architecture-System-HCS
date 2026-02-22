@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCS — Honeycomb Cell System Demo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700&family=Syne:wght@400;700;800&display=swap');
+
+:root {
+  --bg: #04080f;
+  --cell-idle: #0a1628;
+  --cell-border: #1a3a5c;
+  --accent: #00d4ff;
+  --accent2: #ff6b35;
+  --accent3: #7fff7f;
+  --text: #c8d8e8;
+  --text-dim: #4a6a8a;
+  --panel: #070e1a;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Subtle grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+/* Header */
+header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.title-block h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: clamp(22px, 4vw, 36px);
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.title-block h1 span {
+  color: var(--accent);
+}
+
+.title-block p {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+.claim-badge {
+  background: rgba(0,212,255,0.08);
+  border: 1px solid rgba(0,212,255,0.2);
+  padding: 10px 18px;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Truth banner */
+.truth-banner {
+  background: rgba(255,107,53,0.07);
+  border-left: 3px solid var(--accent2);
+  padding: 12px 16px;
+  font-size: 11px;
+  color: rgba(255,107,53,0.9);
+  letter-spacing: 0.05em;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.truth-banner strong {
+  color: var(--accent2);
+}
+
+/* Main layout */
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .main-grid { grid-template-columns: 1fr; }
+}
+
+/* Canvas panel */
+.canvas-panel {
+  background: var(--panel);
+  border: 1px solid var(--cell-border);
+  position: relative;
+  overflow: hidden;
+}
+
+.canvas-panel canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.canvas-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+/* Side panel */
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-block {
+  background: var(--panel);
+  border: 1px solid var(--cell-border);
+  padding: 16px;
+}
+
+.panel-block h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--cell-border);
+}
+
+/* Stats */
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 11px;
+}
+
+.stat-row:last-child { border-bottom: none; }
+
+.stat-label { color: var(--text-dim); }
+
+.stat-value {
+  color: var(--accent);
+  font-weight: 700;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  transition: color 0.3s;
+}
+
+/* Legend */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* Log */
+.log-block {
+  background: var(--panel);
+  border: 1px solid var(--cell-border);
+  padding: 12px 16px;
+}
+
+.log-block h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 10px;
+}
+
+#log {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--text-dim);
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+#log .log-entry { color: var(--text); }
+#log .log-entry.accent { color: var(--accent); }
+#log .log-entry.warn { color: var(--accent2); }
+#log .log-entry.good { color: var(--accent3); }
+
+/* Controls */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+button {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 10px 8px;
+  cursor: pointer;
+  border: 1px solid var(--cell-border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text-dim);
+  transition: all 0.15s;
+}
+
+button:hover {
+  background: rgba(0,212,255,0.08);
+  border-color: rgba(0,212,255,0.4);
+  color: var(--accent);
+}
+
+button.primary {
+  grid-column: span 2;
+  background: rgba(0,212,255,0.1);
+  border-color: rgba(0,212,255,0.3);
+  color: var(--accent);
+}
+
+button.primary:hover {
+  background: rgba(0,212,255,0.2);
+}
+
+/* Mode selector */
+.mode-selector {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.mode-btn {
+  flex: 1;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 7px 4px;
+  cursor: pointer;
+  border: 1px solid var(--cell-border);
+  background: transparent;
+  color: var(--text-dim);
+  transition: all 0.15s;
+}
+
+.mode-btn.active {
+  background: rgba(0,212,255,0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Instruction */
+.instruction {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 8px;
+  border: 1px dashed rgba(255,255,255,0.08);
+  margin-top: 4px;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+}
+
+/* Footer */
+footer {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--cell-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="title-block">
+      <h1>Honeycomb Cell <span>System</span></h1>
+      <p>Raj Mitra · Distributed Computation Demo</p>
+    </div>
+    <div class="claim-badge">Structure = Computation = Communication</div>
+  </header>
+
+  <div class="truth-banner">
+    <strong>What this demo honestly proves:</strong> Each cell knows only its 6 neighbors.
+    There is no central processor. No global coordinator. Computation spreads
+    purely through local cell-to-cell communication. The global result emerges from the topology itself.
+  </div>
+
+  <div class="main-grid">
+
+    <div class="canvas-panel">
+      <span class="canvas-label">Live Grid — Click any cell to inject a task</span>
+      <canvas id="hcs" width="800" height="700"></canvas>
+    </div>
+
+    <div class="side-panel">
+
+      <div class="panel-block">
+        <h3>Mode</h3>
+        <div class="mode-selector">
+          <button class="mode-btn active" onclick="setMode('wave')" id="btn-wave">Wave</button>
+          <button class="mode-btn" onclick="setMode('compute')" id="btn-compute">Compute</button>
+          <button class="mode-btn" onclick="setMode('signal')" id="btn-signal">Signal</button>
+        </div>
+        <div class="instruction" id="mode-desc">
+          Click a cell to inject a wave. Watch it spread only through neighbor links. No central controller.
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <h3>Live Stats</h3>
+        <div class="stat-row">
+          <span class="stat-label">Total Cells</span>
+          <span class="stat-value" id="stat-cells">—</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Active Cells</span>
+          <span class="stat-value" id="stat-active">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Messages Sent</span>
+          <span class="stat-value" id="stat-msgs">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Compute Rounds</span>
+          <span class="stat-value" id="stat-rounds">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Max Hop Depth</span>
+          <span class="stat-value" id="stat-depth">0</span>
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <h3>Legend</h3>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#0a1628;border:1px solid #1a3a5c"></div>
+          Idle — no task
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#003366"></div>
+          Received — processing
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#00d4ff"></div>
+          Active — computing
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#ff6b35"></div>
+          Source — task origin
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#7fff7f"></div>
+          Complete — result stored
+        </div>
+      </div>
+
+      <div class="panel-block">
+        <h3>Controls</h3>
+        <div class="controls">
+          <button class="primary" onclick="resetGrid()">Reset Grid</button>
+          <button onclick="autoDemo()">Auto Demo</button>
+          <button onclick="toggleSpeed()">Speed: <span id="speed-label">1×</span></button>
+        </div>
+      </div>
+
+      <div class="log-block">
+        <h3>Cell Activity Log</h3>
+        <div id="log"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>github.com/Sansmatic-z/Honeycomb-Cell-Architecture-System-HCS</span>
+    <span>Each cell runs the same rule. No exceptions. No center.</span>
+  </footer>
+
+</div>
+
+<script>
+const canvas = document.getElementById('hcs');
+const ctx = canvas.getContext('2d');
+
+// ── HEX GRID SETUP ──────────────────────────────────────
+const HEX_SIZE = 28;
+const COLS = 16;
+const ROWS = 13;
+let cells = {};
+let totalMsgs = 0;
+let totalRounds = 0;
+let maxDepth = 0;
+let mode = 'wave';
+let speed = 1;
+let animFrame;
+
+// Hex grid uses axial coordinates (q, r)
+// Flat-top hexagons
+function hexToPixel(q, r) {
+  const x = HEX_SIZE * 1.5 * q;
+  const y = HEX_SIZE * Math.sqrt(3) * (r + q * 0.5);
+  return { x: x + canvas.width/2 - (HEX_SIZE * 1.5 * (COLS/2 - 0.5)),
+           y: y + canvas.height/2 - (HEX_SIZE * Math.sqrt(3) * (ROWS/2)) };
+}
+
+// 6 hex neighbors in axial coords
+const NEIGHBOR_DIRS = [[1,0],[-1,0],[0,1],[0,-1],[1,-1],[-1,1]];
+
+function neighborKey(q, r, dir) {
+  return `${q+dir[0]},${r+dir[1]}`;
+}
+
+function initGrid() {
+  cells = {};
+  totalMsgs = 0;
+  totalRounds = 0;
+  maxDepth = 0;
+
+  for (let q = 0; q < COLS; q++) {
+    for (let r = -Math.floor(q/2); r < ROWS - Math.floor(q/2); r++) {
+      const key = `${q},${r}`;
+      const pos = hexToPixel(q, r);
+      cells[key] = {
+        q, r, key,
+        x: pos.x, y: pos.y,
+        // State: idle, received, active, complete, source
+        state: 'idle',
+        value: 0,       // The data this cell holds
+        depth: -1,      // How many hops from source
+        alpha: 0,       // Visual fade
+        pulseT: 0,      // Pulse animation timer
+        inbox: [],      // Messages from neighbors waiting to process
+        processed: false,
+        color: null,
+      };
+    }
+  }
+
+  updateStats();
+  log('Grid initialized. ' + Object.keys(cells).length + ' cells ready.', 'accent');
+  log('No central controller. Each cell identical.', '');
+  document.getElementById('stat-cells').textContent = Object.keys(cells).length;
+}
+
+// ── THE CELL RULE ────────────────────────────────────────
+// Every cell runs this exact same rule. No exceptions.
+// This IS the computation. The topology IS the processor.
+
+function cellRule(cell) {
+  if (cell.inbox.length === 0) return;
+
+  // Process all incoming messages
+  const msgs = cell.inbox.splice(0);
+  totalMsgs += msgs.length;
+
+  let bestDepth = cell.depth;
+  let bestValue = cell.value;
+
+  for (const msg of msgs) {
+    if (cell.state === 'idle' || msg.depth < bestDepth || bestDepth === -1) {
+      bestDepth = msg.depth;
+      bestValue = msg.value;
+    }
+  }
+
+  if (cell.state === 'idle') {
+    // First message received — become active
+    cell.state = 'received';
+    cell.depth = bestDepth + 1;
+    cell.value = computeLocalValue(cell, bestValue, bestDepth);
+    cell.pulseT = 1.0;
+
+    if (cell.depth > maxDepth) {
+      maxDepth = cell.depth;
+      document.getElementById('stat-depth').textContent = maxDepth;
+    }
+
+    // Forward to all neighbors (THIS IS THE COMMUNICATION = TOPOLOGY)
+    setTimeout(() => {
+      if (cell.state !== 'idle') {
+        cell.state = 'active';
+        sendToNeighbors(cell);
+      }
+    }, 60 / speed);
+
+    setTimeout(() => {
+      if (cell.state === 'active') {
+        cell.state = 'complete';
+        cell.pulseT = 0.5;
+      }
+    }, 200 / speed);
+  }
+}
+
+function computeLocalValue(cell, incomingValue, incomingDepth) {
+  // Each cell computes its own value from what it received
+  // This is the "Computation" part of Structure=Computation=Communication
+  if (mode === 'wave') {
+    return Math.sin(incomingDepth * 0.5) * 0.5 + 0.5;
+  } else if (mode === 'compute') {
+    // Distributed distance field computation
+    return incomingDepth; // distance from source
+  } else if (mode === 'signal') {
+    // Signal decay — like neural activation propagation
+    return incomingValue * 0.85;
+  }
+  return incomingValue;
+}
+
+function sendToNeighbors(cell) {
+  let sent = 0;
+  for (const dir of NEIGHBOR_DIRS) {
+    const nkey = neighborKey(cell.q, cell.r, dir);
+    if (cells[nkey] && cells[nkey].state === 'idle') {
+      cells[nkey].inbox.push({
+        from: cell.key,
+        depth: cell.depth,
+        value: cell.value
+      });
+      sent++;
+    }
+  }
+  totalMsgs += sent;
+  document.getElementById('stat-msgs').textContent = totalMsgs;
+}
+
+// ── INJECT SOURCE ────────────────────────────────────────
+function injectSource(key) {
+  if (!cells[key]) return;
+  const cell = cells[key];
+
+  cell.state = 'source';
+  cell.depth = 0;
+  cell.value = 1.0;
+  cell.pulseT = 1.0;
+
+  log(`Task injected at cell (${cell.q},${cell.r})`, 'accent');
+  log(`Spreading through neighbors only — no broadcast`, '');
+
+  // Source immediately sends to all neighbors
+  setTimeout(() => {
+    sendToNeighbors(cell);
+    totalRounds++;
+    document.getElementById('stat-rounds').textContent = totalRounds;
+  }, 10);
+}
+
+// ── MAIN LOOP ────────────────────────────────────────────
+function tick() {
+  // Process all cell rules — each cell independent
+  let activeCells = 0;
+  for (const key in cells) {
+    const cell = cells[key];
+    if (cell.inbox.length > 0) {
+      cellRule(cell);
+    }
+    if (cell.state !== 'idle') activeCells++;
+    if (cell.pulseT > 0) cell.pulseT -= 0.02;
+  }
+
+  document.getElementById('stat-active').textContent = activeCells;
+  draw();
+  animFrame = requestAnimationFrame(tick);
+}
+
+// ── DRAWING ──────────────────────────────────────────────
+function drawHex(x, y, size, fillColor, strokeColor, alpha=1, pulse=0) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  if (pulse > 0) {
+    // Glow effect
+    ctx.shadowColor = strokeColor;
+    ctx.shadowBlur = 15 * pulse;
+  }
+
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const angle = Math.PI / 180 * (60 * i);
+    const hx = x + (size - 1) * Math.cos(angle);
+    const hy = y + (size - 1) * Math.sin(angle);
+    if (i === 0) ctx.moveTo(hx, hy);
+    else ctx.lineTo(hx, hy);
+  }
+  ctx.closePath();
+  ctx.fillStyle = fillColor;
+  ctx.fill();
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function getCellColor(cell) {
+  switch(cell.state) {
+    case 'idle':     return { fill: '#0a1628', stroke: '#1a3a5c' };
+    case 'received': return { fill: '#003366', stroke: '#005599' };
+    case 'active': {
+      // Color based on mode and value
+      if (mode === 'wave') {
+        const h = 180 + cell.value * 60;
+        return { fill: `hsl(${h},90%,25%)`, stroke: `hsl(${h},100%,60%)` };
+      } else if (mode === 'compute') {
+        const t = Math.min(1, cell.depth / 15);
+        const h = 200 - t * 120;
+        return { fill: `hsl(${h},80%,20%)`, stroke: `hsl(${h},100%,55%)` };
+      } else {
+        const v = Math.max(0.1, cell.value);
+        return { fill: `rgba(0,${Math.round(v*200)},${Math.round(v*255)},0.9)`,
+                 stroke: `rgba(100,${Math.round(v*255)},255,0.9)` };
+      }
+    }
+    case 'complete': {
+      if (mode === 'wave') {
+        const h = 120 + cell.value * 60;
+        return { fill: `hsl(${h},70%,15%)`, stroke: `hsl(${h},80%,45%)` };
+      } else if (mode === 'compute') {
+        const t = Math.min(1, cell.depth / 15);
+        return { fill: `hsl(${140-t*80},60%,15%)`, stroke: `hsl(${140-t*80},70%,40%)` };
+      } else {
+        return { fill: `rgba(30,100,60,0.9)`, stroke: '#7fff7f' };
+      }
+    }
+    case 'source':   return { fill: '#662200', stroke: '#ff6b35' };
+    default:         return { fill: '#0a1628', stroke: '#1a3a5c' };
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#04080f';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw neighbor connections for active cells (shows communication paths)
+  for (const key in cells) {
+    const cell = cells[key];
+    if (cell.state === 'active' || cell.state === 'source') {
+      for (const dir of NEIGHBOR_DIRS) {
+        const nkey = neighborKey(cell.q, cell.r, dir);
+        const ncell = cells[nkey];
+        if (ncell && ncell.state !== 'idle') {
+          ctx.beginPath();
+          ctx.moveTo(cell.x, cell.y);
+          ctx.lineTo(ncell.x, ncell.y);
+          ctx.strokeStyle = `rgba(0,212,255,${0.08 + cell.pulseT * 0.15})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  // Draw cells
+  for (const key in cells) {
+    const cell = cells[key];
+    const c = getCellColor(cell);
+    const pulse = cell.pulseT > 0 ? cell.pulseT : 0;
+    drawHex(cell.x, cell.y, HEX_SIZE, c.fill, c.stroke, 1, pulse);
+
+    // Show depth number for compute mode
+    if (mode === 'compute' && cell.depth >= 0 && cell.state !== 'idle') {
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '8px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(cell.depth, cell.x, cell.y);
+    }
+
+    // Small activity dot
+    if (cell.inbox.length > 0) {
+      ctx.beginPath();
+      ctx.arc(cell.x, cell.y - HEX_SIZE*0.5, 3, 0, Math.PI*2);
+      ctx.fillStyle = '#00d4ff';
+      ctx.fill();
+    }
+  }
+}
+
+// ── INTERACTION ──────────────────────────────────────────
+canvas.addEventListener('click', (e) => {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const mx = (e.clientX - rect.left) * scaleX;
+  const my = (e.clientY - rect.top) * scaleY;
+
+  // Find closest cell
+  let closest = null;
+  let minDist = HEX_SIZE * 1.2;
+  for (const key in cells) {
+    const cell = cells[key];
+    const dist = Math.hypot(cell.x - mx, cell.y - my);
+    if (dist < minDist) {
+      minDist = dist;
+      closest = cell;
+    }
+  }
+
+  if (closest) {
+    if (closest.state === 'idle') {
+      injectSource(closest.key);
+    } else {
+      log(`Cell (${closest.q},${closest.r}): state=${closest.state} depth=${closest.depth}`, '');
+    }
+  }
+});
+
+canvas.style.cursor = 'crosshair';
+
+// ── CONTROLS ─────────────────────────────────────────────
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-'+m).classList.add('active');
+
+  const descs = {
+    wave: 'Click a cell to inject a wave. Watch it spread only through neighbor links. No central controller.',
+    compute: 'Distributed distance computation. Each cell calculates its hop-distance from source. Numbers show the result.',
+    signal: 'Neural signal propagation. Signal decays with distance — like biological neurons passing activation.'
+  };
+  document.getElementById('mode-desc').textContent = descs[m];
+  resetGrid();
+}
+
+function resetGrid() {
+  if (animFrame) cancelAnimationFrame(animFrame);
+  initGrid();
+  clearLog();
+  tick();
+}
+
+let speedLevel = 1;
+function toggleSpeed() {
+  const levels = [1, 2, 4, 0.5];
+  speedLevel = (speedLevel + 1) % levels.length;
+  speed = levels[speedLevel];
+  document.getElementById('speed-label').textContent = speed + '×';
+}
+
+function autoDemo() {
+  resetGrid();
+  setTimeout(() => {
+    // Pick center cell
+    const q = Math.floor(COLS/2);
+    const r = Math.floor(ROWS/4);
+    const key = `${q},${r}`;
+    if (cells[key]) injectSource(key);
+    log('Auto demo: task injected at grid center', 'good');
+    log('Watch propagation — no central step ever runs', '');
+  }, 300);
+}
+
+// ── LOG ──────────────────────────────────────────────────
+let logLines = 0;
+function log(msg, type='') {
+  const el = document.getElementById('log');
+  const div = document.createElement('div');
+  div.className = 'log-entry' + (type ? ' ' + type : '');
+  div.textContent = '> ' + msg;
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  logLines++;
+  if (logLines > 30) {
+    el.removeChild(el.firstChild);
+    logLines--;
+  }
+}
+
+function clearLog() {
+  document.getElementById('log').innerHTML = '';
+  logLines = 0;
+}
+
+function updateStats() {
+  document.getElementById('stat-msgs').textContent = totalMsgs;
+  document.getElementById('stat-rounds').textContent = totalRounds;
+  document.getElementById('stat-depth').textContent = maxDepth;
+}
+
+// ── START ────────────────────────────────────────────────
+initGrid();
+tick();
+
+// Auto-start demo after 1 second
+setTimeout(() => autoDemo(), 800);
+</script>
+</body>
+</html>

@@ -1,56 +1,174 @@
-# Honeycomb Cell Architecture System (HCS)
+# Honeycomb Cell System (HCS)
 
-> **"Structure = Computation = Communication"**
+> **Structure = Computation = Communication**
 
-**Conceived by Raj Mitra** · Independent Researcher · 2025-2026
-
----
-
-## 1. Overview
-
-HCS is a topology-driven distributed computation paradigm. It is based on the principle that the physical and logical structure of a system should directly determine its computational behavior and communication pathways.
-
-By utilizing a **Hexagonal Lattice Topology**, HCS achieves:
-- **Maximum Spatial Efficiency:** Every cell has exactly 6 neighbors at equal distance.
-- **Decentralized Emergence:** Global logic emerges from local cell-to-cell interactions.
-- **Unified Protocol:** Data representation, execution environment, and network routing are collapsed into a single structural layer.
+**Designed by Raj Mitra** · Independent Researcher · February 2026
 
 ---
 
-## 2. The Modular Kingdom
+## The Core Claim
 
-HCS serves as the foundational architecture for a larger ecosystem of research projects:
+Conventional computers separate three things that may not need to be separate:
 
-### 🌐 [PDPF (Programmable Dynamic Pattern Format)](https://github.com/Sansmatic-z/PDPF)
-A rule-based generative media format designed for AI training and temporal research. It implements the **Supernova Training Curriculum**.
+- **Data** lives in memory
+- **Processing** happens in a CPU
+- **Communication** travels over a bus or network
 
-### 🧠 [LIVINGPATTERN](https://github.com/Sansmatic-z/LIVINGPATTERN)
-A self-training neural system that learns from chaotic pattern dynamics without external supervision.
+Moving data between these layers is expensive. It creates bottlenecks. It requires central coordination.
 
----
+HCS proposes a different starting point: what if a single topology handled all three simultaneously? No central controller. No separate memory layer. No communication overhead. Just cells, each knowing only their immediate neighbors, producing global behavior through local interaction.
 
-## 3. Core Principles
-
-1.  **Locality:** Cells only interact with their immediate 6 neighbors. There is no central controller.
-2.  **Fractal Scaling:** The hexagonal pattern is recursive; a group of 7 cells can form a "Super-Cell" following the same rules.
-3.  **Surprise-Driven Learning:** The system evolves by minimizing the gap between predicted and actual structural states.
+This is not a minor optimization. It is a different philosophy of what computation should be.
 
 ---
 
-## 4. Documentation
+## The Architecture
 
-For the full theoretical background, see the **[Research Concepts Paper](https://github.com/Sansmatic-z/PDPF/blob/main/research_concepts.docx)** located in the PDPF repository.
+HCS organizes computation into a **hexagonal lattice** — the same geometry found in graphene, compound eyes, and biological neural tissue. This is not aesthetic. Hexagonal topology has specific computational properties:
+
+- Every cell has exactly **6 equidistant neighbors** — equal connectivity, no hierarchy
+- **No cell is privileged** over any other — eliminates bottlenecks inherent in hub-and-spoke architectures
+- **Locality is enforced** — each cell operates only on information from immediate neighbors
+- **Fractal scalability** — sub-hives can nest inside cells, making the architecture self-similar at any scale
+- **Spatial expansion** — the system scales by adding cells, not by redesigning architecture
+
+```
+graph TD
+    A[HDA Container .hda] --> B[Spine Parser]
+    B --> C[Topology Manifest]
+    C --> D[Streaming Cell Processor]
+    D --> E[Cell 1: Visual]
+    D --> F[Cell 2: Worker]
+    D --> G[Cell 3: Hive Recursive]
+    E --> H[Sandboxed Output]
+    F --> I[Background Compute]
+    G --> J[Sub-Hive Graph]
+```
+
+### Four Principles
+
+1. **Locality** — Cells operate using only local neighbor information
+2. **Emergent Computation** — Global behavior arises from repeated local transformations
+3. **Structural Execution** — Topology defines execution pathways
+4. **Distributed State** — No central control; the state is the system
+
+---
+
+## HCS as a Root Philosophy
+
+HCS is not just an architecture. It is a philosophy that connects a larger body of work. Every project below grows from the same root idea — that **local interaction producing emergent global behavior** is a more powerful and honest model for computation than centralized control.
+
+### The Framework
+
+```
+HCS — Root Philosophy
+│
+│  Structure = Computation = Communication
+│  Hexagonal topology. Local rules. Emergent behavior.
+│
+├── PDPF (Programmable Dynamic Pattern Format)
+│   HCS expressed as a generative media format.
+│   Rules stored instead of frames. Pattern emerges from local math.
+│   → github.com/Sansmatic-z/PDPF
+│
+├── LivingPattern (Self-Training Neural System)  
+│   HCS expressed as a learning architecture.
+│   Network learns from neighbor-coupled chaotic reality.
+│   No external teacher. Surprise is the signal.
+│   → github.com/Sansmatic-z/LivingPattern
+│
+├── Supernova Training Curriculum
+│   HCS under extreme stress.
+│   Speed doubles every loop. Color decays.
+│   Phase transition forced — what survives is fundamental.
+│   → Documented in PDPF repo
+│
+└── Phase Transition as Learning Mechanism
+    The theoretical framework.
+    Emergent capability may require threshold-crossing events,
+    not just smooth gradient descent.
+    → Documented in research paper below
+```
+
+**These are not four separate projects. They are one idea at four different levels.**
+
+---
+
+## Honest Status
+
+HCS is a **conceptual architecture with a working container implementation**.
+
+The current demo proves the file container protocol — parallel scaling, AES-256-GCM encryption, deflate compression, operating in a browser without dependencies. That is real and working.
+
+The larger architectural claim — that hexagonal topology can unify data, computation, and communication at scale — is not yet proven in code. The theory is documented. The engineering work to demonstrate it at meaningful scale remains ahead.
+
+This is stated honestly so researchers can evaluate the work accurately.
+
+---
+
+## Research & Specifications
+
+- [**Formal Computational Theory**](docs/THEORY.md) — Mathematical models, neighborhood functions, stability conditions
+- [**Implementation Specification**](docs/SPECIFICATION.md) — Runtime engine architecture, memory tiers, communication protocols
+- [**Architecture Overview**](ARCHITECTURE.md) — System layers and design decisions
+- [**Vision Document**](VISION.md) — Long-term direction and philosophical foundations
+- [**Full Research Paper**](https://github.com/Sansmatic-z/PDPF/blob/main/research_concepts.docx) — All five ideas documented formally (DOCX)
+
+---
+
+## Live Demo
+
+A reference implementation of the **HDA (Honeycomb Data Architecture)** container protocol:
+
+→ [demo/demo.hda.html](demo/demo.hda.html) — Open in any modern browser. No install required.
+
+Demonstrates parallel scaling, AES-256-GCM encryption, and deflate compression operating within the HCS topology.
+
+---
+
+## Related Repositories
+
+| Repository | What it is |
+|-----------|------------|
+| **[HCS](https://github.com/Sansmatic-z/Honeycomb-Cell-Architecture-System-HCS)** | Root architecture — you are here |
+| **[PDPF](https://github.com/Sansmatic-z/PDPF)** | Programmable Dynamic Pattern Format — generative media format and Supernova demo |
+| **[LivingPattern](https://github.com/Sansmatic-z/LivingPattern)** | Self-training neural system — working Python experiment with results |
+
+---
+
+## Connection to Existing Research
+
+HCS relates to but is distinct from several existing directions:
+
+- **Neuromorphic computing** (Intel Loihi, IBM TrueNorth) — uses mesh topologies but not hexagonal, and does not unify the three layers as a single structure
+- **In-memory computing** — proposes computation where data lives, but not emergent topology-based execution
+- **Cellular automata** (Conway, Wolfram) — formalizes emergent computation from local rules, but is not applied as a practical computing architecture
+- **Dataflow architectures** — eliminate central control but do not use spatial topology as the computational substrate
+
+HCS specifically proposes hexagonal topology as the unifying substrate for all three concerns simultaneously, and connects this to the emergent learning work in LivingPattern. This specific synthesis is original.
 
 ---
 
 ## Author
 
-**Raj Mitra** — Independent researcher.
+**Raj Mitra** — Independent researcher. No institutional affiliation. No formal credentials.
+
+All ideas in this repository and the connected framework were developed independently through first-principles reasoning.
 
 GitHub: [github.com/Sansmatic-z](https://github.com/Sansmatic-z)
 
 ---
 
+## Citation
+
+If you use this work in research or projects, please cite using [CITATION.cff](CITATION.cff).
+
+---
+
 ## License
 
-MIT
+MIT — Free to use, study, and build on. Attribution appreciated.
+
+---
+
+*"A honeycomb does not have a manager. Every cell knows only its neighbors. The structure builds itself."*
